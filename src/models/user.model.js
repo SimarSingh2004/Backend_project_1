@@ -31,7 +31,7 @@ const userSchema = new Schema(
     coverImage: {
       type: String,
     },
-    watchHstory: [
+    watchHistory: [
       {
         type: Schema.Types.ObjectId,
         ref: "Video",
@@ -50,19 +50,19 @@ const userSchema = new Schema(
   }
 );
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function (next) {     //hook to hash the password before saving the user document
   if (this.isModified("password"))
     this.password = await bcrypt.hash(this.password, 10);
 
   next();
 });
 
-userSchema.methods.isPasswordCorrect = async function (password) {
+userSchema.methods.isPasswordCorrect = async function (password) {   //method to check if the provided password matches the hashed password stored in the database
   return await bcrypt.compare(password, this.password);
 };
 
 userSchema.methods.generateAccessToken = function () {
-  jwt.sign(
+  return jwt.sign(
     {
       id: this._id,
       email: this.email,
@@ -76,7 +76,7 @@ userSchema.methods.generateAccessToken = function () {
 };
 
 userSchema.methods.generateRefreshToken = function () {
-  jwt.sign(
+  return jwt.sign(
     {
       id: this._id,
     },
