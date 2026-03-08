@@ -18,8 +18,18 @@ const registerUser = asyncHandler(async (req, res) => {
 
   if (userExists) throw new ApiError(409, "User already existes");
 
+  //req.files is an object containing the uploaded files, where the keys are the field names specified in the multer middleware and the values are arrays of file objects. So, to access the path of the uploaded avatar and coverImage, we use req.files?.avatar[0]?.path and req.files?.coverImage[0]?.path respectively.
   const avatarLocalPath = req.files?.avatar[0]?.path;
-  const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  //const coverImageLocalPath = req.files?.coverImage[0]?.path;
+
+  let coverImageLocalPath = null;
+  if (
+    req.files &&
+    Array.isArray(req.files.coverImage) &&
+    req.files.coverImage.length > 0
+  ) {
+    coverImageLocalPath = req.files.coverImage[0].path;
+  }
 
   if (!avatarLocalPath) throw new ApiError(400, "Avatar is required");
 

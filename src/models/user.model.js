@@ -50,14 +50,14 @@ const userSchema = new Schema(
   }
 );
 
-userSchema.pre("save", async function (next) {     //hook to hash the password before saving the user document
+userSchema.pre("save", async function () {
+  //hook to hash the password before saving the user document
   if (this.isModified("password"))
     this.password = await bcrypt.hash(this.password, 10);
-
-  next();
 });
 
-userSchema.methods.isPasswordCorrect = async function (password) {   //method to check if the provided password matches the hashed password stored in the database
+userSchema.methods.isPasswordCorrect = async function (password) {
+  //method to check if the provided password matches the hashed password stored in the database
   return await bcrypt.compare(password, this.password);
 };
 

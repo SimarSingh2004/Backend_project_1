@@ -1,3 +1,7 @@
+// load env variables in case this module is imported before index.js runs
+import dotenv from "dotenv";
+dotenv.config();
+
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
@@ -12,15 +16,20 @@ const UploadOnCloudinary = async (localFilePath) => {
   try {
     if (!localFilePath) return null;
 
-    const respose = await cloudinary.uploader.upload(localFilePath, {
+    const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "auto",
     });
 
-    console.log("File uploaded to clousinary successfully ", respose.url);
+    //console.log("File uploaded to cloudinary successfully ", response.url);
+    fs.unlinkSync(localFilePath);
     return response;
   } catch (error) {
-    fs.unlinkSync(localFilePath); //remove the locally saved temporary file as the upload operation got failed
-    console.log("Error uploading file to Clousinary ", error);
+    try {
+      fs.unlinkSync(localFilePath); //remove the locally saved temporary file as the upload operation got failed
+    } catch (unlinkError) {
+      console.log("Error removing temporary file ", unlinkError);
+    }
+    console.log("Error uploading file to Cloudinary ", error);
     return null;
   }
 };
